@@ -1,4 +1,5 @@
 const dotenv = require("dotenv");
+const { resolve } = require("path");
 
 let ENV_FILE_NAME = "";
 switch (process.env.NODE_ENV) {
@@ -56,23 +57,31 @@ const fileServicePlugin = cloudinaryConfigured
       upload_dir: "uploads",
     },
   };
+  const STRIPE_API_KEY = "sk_test_51OClCgHA9zjqz4pzaTJP6Kkw11Gx8AflF0uddSWxzCgZeNE60S2IM1Tun7vfxuYkouC0oqiIE6jbJm2f1ADpIPKh00a37WG9wG";
 
-const plugins = [
-  `medusa-fulfillment-manual`,
-  `medusa-payment-manual`,
-  fileServicePlugin,
-  {
-    resolve: "@medusajs/admin",
-    /** @type {import('@medusajs/admin').PluginOptions} */
-    options: {
-      autoRebuild: true,
-      develop: {
-        open: process.env.OPEN_BROWSER !== "false",
-        port: ADMIN_APP_PORT,
+  const plugins = [
+    `medusa-fulfillment-manual`,
+    `medusa-payment-manual`,
+    {
+      resolve: "medusa-payment-stripe",
+      options: {
+        api_key: STRIPE_API_KEY, // Corrected key name
       },
     },
-  },
-];
+    fileServicePlugin, // Ensure this is properly declared or imported
+    {
+      resolve: "@medusajs/admin",
+      /** @type {import('@medusajs/admin').PluginOptions} */
+      options: {
+        autoRebuild: true,
+        develop: {
+          open: process.env.OPEN_BROWSER !== "false",
+          port: process.env.ADMIN_APP_PORT || 7000, // Ensure ADMIN_APP_PORT is defined or set a default
+        },
+      },
+    },
+  ];
+  
 
 const modules = {
   /*eventBus: {
